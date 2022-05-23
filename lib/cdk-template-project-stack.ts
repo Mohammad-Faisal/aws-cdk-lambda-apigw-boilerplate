@@ -1,18 +1,7 @@
 import * as cdk from "@aws-cdk/core";
-import {
-  Stack,
-  StackProps,
-  Duration,
-  CfnOutput,
-  aws_apigateway as apigateway,
-  aws_lambda as lambda,
-  aws_secretsmanager as secretsmanager,
-} from "aws-cdk-lib";
+import { Stack, StackProps } from "aws-cdk-lib";
 import { Construct } from "constructs";
-import * as path from "path";
-import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
-import { SecureRestApi } from "../constructs/SecureRestApi";
-import { CommonLambdaFunction } from "../constructs/CommonLambdaFunction";
+
 import {
   CodePipeline,
   CodePipelineSource,
@@ -20,7 +9,7 @@ import {
   ShellStep,
   Step,
 } from "aws-cdk-lib/pipelines";
-import { AppStage } from "../constructs/stage";
+import { AppStage } from "../constructs/Stage";
 
 export interface CdkTemplateProjectStackProps extends StackProps {
   readonly zoneName: string;
