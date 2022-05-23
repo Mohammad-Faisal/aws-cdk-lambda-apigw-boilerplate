@@ -19,7 +19,6 @@ export class SecureRestApi extends Construct {
     this.restAPI = this.createGateway(props.environment, props.apiName);
   }
   private createGateway(environment: string, apiName: string): RestApi {
-    //...
     const api = new apigateway.RestApi(this, `${environment}-${apiName}`, {
       description: "A simple API example for Demonstration Purpose",
       restApiName: "CdkTemplateAPI",

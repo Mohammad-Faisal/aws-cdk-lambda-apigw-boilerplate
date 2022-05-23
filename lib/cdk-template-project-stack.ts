@@ -16,9 +16,11 @@ import { CommonLambdaFunction } from "../constructs/CommonLambdaFunction";
 import {
   CodePipeline,
   CodePipelineSource,
+  ManualApprovalStep,
   ShellStep,
   Step,
 } from "aws-cdk-lib/pipelines";
+import { AppStage } from "../constructs/stage";
 
 export interface CdkTemplateProjectStackProps extends StackProps {
   readonly zoneName: string;
@@ -32,35 +34,35 @@ export class CdkTemplateProjectStack extends Stack {
   ) {
     super(scope, id, props);
 
-    const api = new SecureRestApi(this, "SecureRestApi", {
-      environment: "dev",
-      apiName: "template-api",
-    });
-
-    const myLambda = new CommonLambdaFunction(this, "HelloLambda", {
-      environment: "dev",
-      functionName: "hello-lambda",
-      functionPath: "../src/hello-lambda/app.ts",
-    });
-
-    api.addLambdaIntegrationRoute("hello", "GET", myLambda.function);
-    new CfnOutput(this, "apiUrl", { value: api.restAPI.url });
-
-    const secret = new secretsmanager.Secret(this, "SecretValue", {
-      secretName: "my-secret-token",
-    });
-    secret.grantRead(myLambda.function);
-
-    new CodePipeline(this, "Pipeline", {
+    const pipeline = new CodePipeline(this, "Pipeline", {
       pipelineName: "TestPipeline",
       synth: new ShellStep("Synth", {
         input: CodePipelineSource.gitHub(
           "Mohammad-Faisal/aws-cdk-lambda-apigw-boilerplate",
           "master"
-        ), //Remember to change
+        ),
         commands: ["npm ci", "npm run build", "npx cdk synth"],
       }),
     });
+
+    const testingStage = pipeline.addStage(
+      new AppStage(this, "dev", {
+        env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: "us-east-1" },
+      })
+    );
+
+    testingStage.addPre(
+      new ShellStep("Run Unit Tests", { commands: ["npm install", "npm test"] })
+    );
+    testingStage.addPost(
+      new ManualApprovalStep("Manual approval before production")
+    );
+
+    const prodStage = pipeline.addStage(
+      new AppStage(this, "prod", {
+        env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: "us-east-1" },
+      })
+    );
   }
 }
 
