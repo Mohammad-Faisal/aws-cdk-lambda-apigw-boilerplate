@@ -1,5 +1,5 @@
 import * as cdk from "@aws-cdk/core";
-import { Stack, StackProps } from "aws-cdk-lib";
+import { SecretValue, Stack, StackProps } from "aws-cdk-lib";
 import { Construct } from "constructs";
 
 import {
@@ -11,16 +11,10 @@ import {
 } from "aws-cdk-lib/pipelines";
 import { AppStage } from "../constructs/Stage";
 
-export interface CdkTemplateProjectStackProps extends StackProps {
-  readonly zoneName: string;
-}
+export interface PipelineStackProps extends StackProps {}
 
-export class CdkTemplateProjectStack extends Stack {
-  constructor(
-    scope: Construct,
-    id: string,
-    props?: CdkTemplateProjectStackProps
-  ) {
+export class PipelineStack extends Stack {
+  constructor(scope: Construct, id: string, props?: PipelineStackProps) {
     super(scope, id, props);
 
     const pipeline = new CodePipeline(this, "Pipeline", {
@@ -28,7 +22,10 @@ export class CdkTemplateProjectStack extends Stack {
       synth: new ShellStep("Synth", {
         input: CodePipelineSource.gitHub(
           "Mohammad-Faisal/aws-cdk-lambda-apigw-boilerplate",
-          "master"
+          "master",
+          {
+            authentication: SecretValue.secretsManager("github-token"),
+          }
         ),
         commands: ["npm ci", "npm run build", "npx cdk synth"],
       }),
