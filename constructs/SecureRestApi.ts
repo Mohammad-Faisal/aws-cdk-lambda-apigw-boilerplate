@@ -21,7 +21,6 @@ export class SecureRestApi extends Construct {
   private createGateway(environment: string, apiName: string): RestApi {
     const api = new apigateway.RestApi(this, `${environment}-${apiName}`, {
       description: "A simple API example for Demonstration Purpose",
-      restApiName: "CdkTemplateAPI",
       defaultCorsPreflightOptions: {
         allowOrigins: apigateway.Cors.ALL_ORIGINS,
       },

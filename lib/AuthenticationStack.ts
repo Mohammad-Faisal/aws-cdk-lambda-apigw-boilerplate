@@ -38,10 +38,10 @@ export class AuthenticationStack extends Stack {
 
     api.addLambdaIntegrationRoute("hello", "GET", myLambda.function);
 
-    const secret = new secretsmanager.Secret(this, "SecretValue", {
-      secretName: "my-secret-token",
-    });
-    secret.grantRead(myLambda.function);
+    // const secret = new secretsmanager.Secret(this, "SecretValue", {
+    //   secretName: "my-secret-token",
+    // });
+    // secret.grantRead(myLambda.function);
 
     this.urlOutput = new CfnOutput(this, "apiUrl", { value: api.restAPI.url });
   }
