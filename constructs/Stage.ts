@@ -8,9 +8,13 @@ export class AppStage extends cdk.Stage {
   constructor(scope: Construct, stageName: string, props?: cdk.StageProps) {
     super(scope, stageName, props);
 
-    const authStack = new AuthenticationStack(this, "AuthenticationService", {
-      stageName,
-    });
+    const authStack = new AuthenticationStack(
+      this,
+      `${stageName}-AuthenticationService`,
+      {
+        stageName,
+      }
+    );
 
     this.urlOutput = authStack.urlOutput;
   }

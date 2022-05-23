@@ -22,7 +22,7 @@ export class AuthenticationStack extends Stack {
     super(scope, id, props);
 
     const api = new SecureRestApi(this, `${props.stageName}-SecureRestApi`, {
-      environment: "dev",
+      environment: props.stageName,
       apiName: "template-api",
     });
 
@@ -30,7 +30,7 @@ export class AuthenticationStack extends Stack {
       this,
       `${props.stageName}-HelloLambda`,
       {
-        environment: "dev",
+        environment: props.stageName,
         functionName: "hello-lambda",
         functionPath: "../src/hello-lambda/app.ts",
       }
