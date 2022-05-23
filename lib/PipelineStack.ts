@@ -24,7 +24,7 @@ export class PipelineStack extends Stack {
           "Mohammad-Faisal/aws-cdk-lambda-apigw-boilerplate",
           "master",
           {
-            authentication: SecretValue.secretsManager("github-token"),
+            authentication: SecretValue.secretsManager("github-token-new"),
           }
         ),
         commands: ["npm ci", "npm run build", "npx cdk synth"],

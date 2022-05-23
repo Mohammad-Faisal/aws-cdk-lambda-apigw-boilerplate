@@ -135,3 +135,15 @@ sam-beta-cdk local invoke CDKStackName/FunctionID -e events/mock.json -n envloca
 ```sh
 sam-beta-cdk local start-api -n env-local --warm-containers EAGER
 ```
+
+### Resolving cdk synth error
+
+cdk automatically want's docker to run the synthesis. If you don't have docker installed on your machine you will get an error.
+
+The solution is either you install docker and start it or you can just install `esbuild`
+
+```
+npm install esbuild
+```
+
+because it's the default thing. It will resolve your error on the pipeline
