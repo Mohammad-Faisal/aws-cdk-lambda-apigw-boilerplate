@@ -13,6 +13,12 @@ import * as path from "path";
 import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
 import { SecureRestApi } from "../constructs/SecureRestApi";
 import { CommonLambdaFunction } from "../constructs/CommonLambdaFunction";
+import {
+  CodePipeline,
+  CodePipelineSource,
+  ShellStep,
+  Step,
+} from "aws-cdk-lib/pipelines";
 
 export interface CdkTemplateProjectStackProps extends StackProps {
   readonly zoneName: string;
@@ -44,6 +50,17 @@ export class CdkTemplateProjectStack extends Stack {
       secretName: "my-secret-token",
     });
     secret.grantRead(myLambda.function);
+
+    new CodePipeline(this, "Pipeline", {
+      pipelineName: "TestPipeline",
+      synth: new ShellStep("Synth", {
+        input: CodePipelineSource.gitHub(
+          "Mohammad-Faisal/aws-cdk-lambda-apigw-boilerplate",
+          "master"
+        ), //Remember to change
+        commands: ["npm ci", "npm run build", "npx cdk synth"],
+      }),
+    });
   }
 }
 
