@@ -46,13 +46,4 @@ export class CommonLambdaFunction extends Construct {
     );
     return myLambda;
   }
-  // public addLambdaIntegrationRoute(
-  //   route: string,
-  //   httpMethod: string,
-  //   lambdaFn: lambda.IFunction
-  // ): void {
-  //   const integration = new apigateway.LambdaIntegration(lambdaFn);
-  //   const path = this.restAPI.root.addResource(route);
-  //   path.addMethod(httpMethod, integration);
-  // }
 }

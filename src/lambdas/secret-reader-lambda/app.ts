@@ -1,7 +1,10 @@
 import * as AWS from "aws-sdk";
+import { getSecret } from "../../utils/get-secret";
 
 exports.handler = async function (event: any, context: any) {
   console.log("request ", JSON.stringify(event));
+
+  const secretValue = await getSecret("my-secret-token");
 
   // const config = { region: "us-east-1" };
   // let secretsManager = new AWS.SecretsManager(config);
@@ -15,7 +18,7 @@ exports.handler = async function (event: any, context: any) {
   //   return (decodedBinarySecret = buff.toString("ascii"));
   // }
   // const responseText = secretValue.SecretString + "updated";
-  const responseText = "updated";
+  const responseText = secretValue ?? "No value found";
 
   return {
     headers: {
@@ -29,6 +32,6 @@ exports.handler = async function (event: any, context: any) {
     isBase64Encoded: false,
     multiValueHeaders: {},
     statusCode: 200,
-    body: JSON.stringify(responseText),
+    body: responseText,
   };
 };

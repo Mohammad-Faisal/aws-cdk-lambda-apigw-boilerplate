@@ -9,7 +9,7 @@ import {
   ShellStep,
   Step,
 } from "aws-cdk-lib/pipelines";
-import { AppStage } from "../constructs/Stage";
+import { ServerlessAppStage } from "../constructs/ServerlessAppStage";
 
 export interface PipelineStackProps extends StackProps {}
 
@@ -17,7 +17,6 @@ export class PipelineStack extends Stack {
   constructor(scope: Construct, id: string, props?: PipelineStackProps) {
     super(scope, id, props);
 
-    // const pipeline =
     const pipeline = new CodePipeline(this, "Pipeline", {
       pipelineName: "TestPipeline",
       synth: new ShellStep("Synth", {
@@ -33,7 +32,7 @@ export class PipelineStack extends Stack {
     });
 
     const devStage = pipeline.addStage(
-      new AppStage(this, "dev", {
+      new ServerlessAppStage(this, "dev", {
         env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: "us-east-1" },
       })
     );

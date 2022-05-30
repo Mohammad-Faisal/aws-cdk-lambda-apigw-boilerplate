@@ -2,13 +2,15 @@
   "name": "cdk-template-project",
   "version": "0.1.0",
   "bin": {
-    "cdk-template-project": "bin/cdk-template-project.js"
+    "cdk-template-project": "src/index.js"
   },
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
     "test": "jest",
-    "cdk": "cdk"
+    "cdk": "cdk",
+    "synth-dev": "cross-env STAGE_NAME=dev cdk synth --profile faisal",
+    "deploy-dev": "cross-env STAGE_NAME=dev cdk deploy --profile faisal"
   },
   "devDependencies": {
     "@types/jest": "^27.5.1",
@@ -27,6 +29,7 @@
     "aws-sdk": "^2.1140.0",
     "cdk-dia": "^0.7.0",
     "constructs": "^10.1.13",
+    "cross-env": "^7.0.3",
     "esbuild": "^0.14.39",
     "source-map-support": "^0.5.21"
   }
