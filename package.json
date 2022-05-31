@@ -10,7 +10,7 @@
     "test": "jest",
     "cdk": "cdk",
     "synth-dev": "cross-env STAGE_NAME=dev cdk synth --profile faisal",
-    "deploy-dev": "cross-env STAGE_NAME=dev cdk deploy --profile faisal"
+    "deploy-dev": "cross-env STAGE_NAME=dev cdk deploy --all --profile faisal"
   },
   "devDependencies": {
     "@types/jest": "^27.5.1",

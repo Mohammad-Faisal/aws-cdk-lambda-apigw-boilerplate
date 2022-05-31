@@ -18,7 +18,6 @@ export class PipelineStack extends Stack {
     super(scope, id, props);
 
     const pipeline = new CodePipeline(this, "Pipeline", {
-      pipelineName: "TestPipeline",
       synth: new ShellStep("Synth", {
         input: CodePipelineSource.gitHub(
           "Mohammad-Faisal/aws-cdk-lambda-apigw-boilerplate",
@@ -45,7 +44,7 @@ export class PipelineStack extends Stack {
     );
 
     const prodStage = pipeline.addStage(
-      new AppStage(this, "prod", {
+      new ServerlessAppStage(this, "prod", {
         env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: "us-east-1" },
       })
     );
