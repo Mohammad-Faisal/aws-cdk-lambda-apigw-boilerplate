@@ -8,6 +8,8 @@ import { ServerlessStack } from "./stacks/ServerlessStack";
 import { VpcStack } from "./stacks/VpcStack";
 import { PeeringStack } from "./stacks/PeeringStack";
 import { Ec2InstanceStack } from "./stacks/Ec2InstanceStack";
+import { LambdaInVpcStack } from "./stacks/LambdaInVpcStack";
+import { AllowVPCPeeringDNSResolution } from "./stacks/AllowVpcPeeringDnsResolution";
 
 const app = new App();
 
@@ -23,27 +25,36 @@ async function main() {
 
   console.log("build config is  ", buildConfig);
 
-  const vpcPeers = new VpcStack(app, "VpcStack", {
-    vpcSetup: {
-      // They are red , blue ,green
-      cidrs: ["10.0.0.0/16", "10.1.0.0/16", "10.2.0.0/16"], // <--- two non-overlapping CIDR ranges for our two VPCs
-      maxAzs: 1, // <--- to keep the costs down, we'll stick to 1 availability zone per VPC (obviously, not something you'd want to do in production)
-    },
+  const redVpc = new VpcStack(app, "Shared-VpcStack", {
+    vpcName: "Shared",
+    cidr: "10.0.0.0/16", // <--- two non-overlapping CIDR ranges for our two VPCs
+    maxAzs: 1, // <--- to keep the costs down, we'll stick to 1 availability zone per VPC (obviously, not something you'd want to do in production)
   });
 
-  new Ec2InstanceStack(app, "InstancePeersStack", {
-    vpcs: vpcPeers.createdVpcs,
+  const blueVpc = new VpcStack(app, "Dedicated-VpcStack", {
+    vpcName: "Dedicated-Blue",
+    cidr: "10.1.0.0/16",
+    maxAzs: 1, // <--- to keep the costs down, we'll stick to 1 availability zone per VPC (obviously, not something you'd want to do in production)
   });
+
+  // TODO: Ideally there will be only one stack and the names will be defined by the stage
+
+  //   new Ec2InstanceStack(app, "InstancePeersStack", {
+  //     vpcs: [blueVpc.createdVpc, redVpc.createdVpc],
+  //   });
 
   // I want to reach Red from Blue
-  new PeeringStack(app, "Blue-Red-Peering", {
-    vpcs: [vpcPeers.createdVpcs[1], vpcPeers.createdVpcs[0]],
+  const peeringConnection = new PeeringStack(app, "Blue-Red-Peering", {
+    vpcs: [blueVpc.createdVpc, redVpc.createdVpc],
   });
 
-  // I want to reach Red from Green
-  new PeeringStack(app, "Green-Red-Peering", {
-    vpcs: [vpcPeers.createdVpcs[2], vpcPeers.createdVpcs[0]],
-  });
+  //   new AllowVPCPeeringDNSResolution(app, "Blue-Red-Peering-DNS-Resolution", {
+  //     vpcPeering: peeringConnection.peeringConnection,
+  //   });
+
+  //   new LambdaInVpcStack(app, "LambdaInVpcStack", {
+  //     vpc: blueVpc.createdVpc,
+  //   });
 
   //   new ServerlessStack(app, `${stageName}-ServerlessStack`, {
   //     stageName,

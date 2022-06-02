@@ -9,16 +9,15 @@ import { Construct } from "constructs";
 
 export interface SecureRestApiProps extends StackProps {
   apiName: string;
-  environment: string;
 }
 
 export class SecureRestApi extends Construct {
   public restAPI: RestApi;
   constructor(scope: Construct, id: string, props: SecureRestApiProps) {
     super(scope, id);
-    this.restAPI = this.createGateway(props.environment, props.apiName);
+    this.restAPI = this.createGateway(props.apiName);
   }
-  private createGateway(environment: string, apiName: string): RestApi {
+  private createGateway(apiName: string): RestApi {
     const api = new apigateway.RestApi(this, apiName, {
       description: "A simple API",
       defaultCorsPreflightOptions: {

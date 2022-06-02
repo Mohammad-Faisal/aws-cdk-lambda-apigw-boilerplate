@@ -11,7 +11,6 @@ import * as path from "path";
 export interface CommonLambdaFunctionProps extends StackProps {
   functionPath: string;
   functionName: string;
-  environment: string;
 }
 
 export class CommonLambdaFunction extends Construct {
@@ -19,31 +18,24 @@ export class CommonLambdaFunction extends Construct {
   constructor(scope: Construct, id: string, props: CommonLambdaFunctionProps) {
     super(scope, id);
     this.function = this.createLambdaFunction(
-      props.environment,
       props.functionName,
       props.functionPath
     );
   }
   private createLambdaFunction(
-    environment: string,
     functionName: string,
     functionPath: string
   ): NodejsFunction {
-    //...
-    const myLambda = new NodejsFunction(
-      this,
-      `${environment}-${functionName}`,
-      {
-        runtime: lambda.Runtime.NODEJS_14_X,
-        entry: path.join(__dirname, functionPath),
-        handler: "handler",
-        timeout: Duration.seconds(20),
-        bundling: {
-          minify: true,
-          externalModules: ["aws-sdk"],
-        },
-      }
-    );
+    const myLambda = new NodejsFunction(this, functionName, {
+      runtime: lambda.Runtime.NODEJS_14_X,
+      entry: path.join(__dirname, functionPath),
+      handler: "handler",
+      timeout: Duration.seconds(20),
+      bundling: {
+        minify: true,
+        externalModules: ["aws-sdk"],
+      },
+    });
     return myLambda;
   }
 }

@@ -21,7 +21,6 @@ export class ServerlessStack extends Stack {
     super(scope, id, props);
 
     const api = new SecureRestApi(this, "SecureRestApi", {
-      environment: props.stageName,
       apiName: "serverless-api",
     });
 
@@ -30,7 +29,6 @@ export class ServerlessStack extends Stack {
     });
 
     const myLambda = new CommonLambdaFunction(this, "SecretReaderLambda", {
-      environment: props.stageName,
       functionName: "secret-reader-lambda",
       functionPath: "../lambdas/secret-reader-lambda/app.ts",
     });

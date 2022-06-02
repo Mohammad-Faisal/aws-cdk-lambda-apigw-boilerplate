@@ -9,12 +9,15 @@ import {
 } from "aws-cdk-lib";
 import { Construct } from "constructs";
 import * as ec2 from "aws-cdk-lib/aws-ec2";
+import { AllowVPCPeeringDNSResolution } from "./AllowVpcPeeringDnsResolution";
 
 interface PeeringProps extends StackProps {
   vpcs: [ec2.Vpc, ec2.Vpc]; // <--- a fixed-length array (a tuple type in TypeScript parlance) consisting of two VPC objects between which the peering connection will be made
 }
 
 export class PeeringStack extends Stack {
+  public readonly peeringConnection: ec2.CfnVPCPeeringConnection;
+
   constructor(scope: Construct, id: string, props: PeeringProps) {
     super(scope, id, props);
 
@@ -46,5 +49,11 @@ export class PeeringStack extends Stack {
         });
       }
     );
+
+    new AllowVPCPeeringDNSResolution(this, "Blue-Red-Peering-DNS-Resolution", {
+      vpcPeering: peer,
+    });
+
+    this.peeringConnection = peer;
   }
 }
