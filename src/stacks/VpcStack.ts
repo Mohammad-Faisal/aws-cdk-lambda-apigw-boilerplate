@@ -1,72 +1,38 @@
 import {
   Stack,
   StackProps,
-  Duration,
-  CfnOutput,
   aws_ec2 as ec2,
-  aws_apigateway as apigateway,
-  aws_lambda as lambda,
-  aws_secretsmanager as secretsmanager,
+  CfnOutput,
+  aws_ssm as ssm,
 } from "aws-cdk-lib";
 import { Construct } from "constructs";
-interface VpcProps extends StackProps {
-  vpcName: string;
-  cidr: string; // <--- each VPC will need a list of CIDRs
-  maxAzs?: number; // <--- optionally the number of Availability Zones can be provided; defaults to 2 in our particular case
-  vpnConnections?: {
-    // <--- if dealing with Site-to-Site VPN, the VPN connection details can be provided
-    [id: string]: ec2.VpnConnectionOptions;
-  };
+import { VpcConstruct } from "../constructs/VpcConstruct";
+import { VpcPeeringConstruct } from "../constructs/VpcPeeringConstruct";
+
+interface VpcStackProps extends StackProps {
+  cidrRange: string;
 }
 
 export class VpcStack extends Stack {
-  readonly createdVpc: ec2.Vpc; // <-- create a class property for exposing the list of VPC objects
+  readonly createdVpc: ec2.Vpc;
 
-  constructor(scope: Construct, id: string, props: VpcProps) {
+  constructor(scope: Construct, id: string, props: VpcStackProps) {
     super(scope, id, props);
 
-    const createdVpc: ec2.Vpc = new ec2.Vpc(this, props.vpcName, {
-      cidr: props.cidr,
-      maxAzs: props.maxAzs,
-      natGateways: 1,
-      subnetConfiguration: [
-        {
-          cidrMask: 24,
-          name: "public",
-          subnetType: ec2.SubnetType.PUBLIC,
-        },
-        {
-          cidrMask: 24,
-          name: "private-isolated",
-          subnetType: ec2.SubnetType.PRIVATE_ISOLATED,
-        },
-        {
-          name: "private-nat",
-          subnetType: ec2.SubnetType.PRIVATE_WITH_NAT,
-          cidrMask: 24,
-        },
-      ],
-      vpnConnections: props.vpnConnections,
+    const redVpc = new VpcConstruct(this, "Red-Vpc", {
+      vpcName: "Shared",
+      cidr: props.cidrRange,
+      maxAzs: 1,
     });
 
-    const sg = ec2.SecurityGroup.fromSecurityGroupId(
-      this,
-      "DefaultSecurityGroup",
-      createdVpc.vpcDefaultSecurityGroup
-    );
+    this.createdVpc = redVpc.createdVpc;
 
-    sg.addIngressRule(
-      ec2.Peer.anyIpv4(),
-      ec2.Port.icmpPing(),
-      "Allow ping from anywhere"
-    );
+    const ssmParam = new ssm.StringParameter(this, `sharedVpcId`, {
+      parameterName: `sharedVpcId`,
+      stringValue: redVpc.createdVpc.vpcId,
+    });
 
-    sg.addIngressRule(
-      ec2.Peer.anyIpv4(),
-      ec2.Port.tcp(22),
-      "allow SSH access from anywhere"
-    );
-
-    this.createdVpc = createdVpc;
+    new CfnOutput(this, "apiUrl", { value: redVpc.createdVpc.vpcId });
+    new CfnOutput(this, "ssmId", { value: ssmParam.parameterName });
   }
 }

@@ -9,7 +9,7 @@ import {
 } from "aws-cdk-lib";
 import { Construct } from "constructs";
 import * as ec2 from "aws-cdk-lib/aws-ec2";
-import { AllowVPCPeeringDNSResolution } from "./AllowVpcPeeringDnsResolution";
+import { AllowVPCPeeringDNSResolution } from "../constructs/AllowVpcPeeringDnsResolution";
 
 interface PeeringProps extends StackProps {
   vpcs: [ec2.Vpc, ec2.Vpc]; // <--- a fixed-length array (a tuple type in TypeScript parlance) consisting of two VPC objects between which the peering connection will be made

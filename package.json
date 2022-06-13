@@ -9,7 +9,8 @@
     "watch": "tsc -w",
     "test": "jest",
     "cdk": "cdk",
-    "synth-dev": "cross-env STAGE_NAME=dev cdk synth --profile faisal",
+    "bootstrap-dev": "cross-env STAGE_NAME=dev cdk bootstrap aws://837984857695/us-west-1 --profile faisal",
+    "synth-dev": "cross-env STAGE_NAME=dev cdk synth --all --profile faisal",
     "deploy-dev": "cross-env STAGE_NAME=dev cdk deploy --all --profile faisal"
   },
   "devDependencies": {
